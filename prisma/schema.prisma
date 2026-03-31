@@ -22,7 +22,7 @@ model Transcript {
 }
 
 model Task {
-  id           String       @id @default(uuid())
+  id           String
   transcriptId String
   transcript   Transcript   @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
 
@@ -30,6 +30,8 @@ model Task {
   priority     TaskPriority
   dependencies Json
   status       TaskStatus
+
+  @@id([transcriptId, id])
 }
 
 enum TaskPriority {

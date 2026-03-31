@@ -1,6 +1,16 @@
-node_modules
-dist
-# Keep environment variables out of version control
+# dependencies
+node_modules/
+
+# build output
+.next/
+dist/
+build/
+
+# environment
 .env
 
-/src/generated/prisma
+# logs
+*.log
+
+# OS
+.DS_Store

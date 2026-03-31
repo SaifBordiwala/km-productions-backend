@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import logger from "./utils/logger";
 import transcriptsRouter from "./routes/transcripts.route";
+import jobsRouter from "./routes/jobs.route";
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use(
 );
 
 // Routes
+app.use("/jobs", jobsRouter);
 app.use("/transcripts", transcriptsRouter);
 
 app.get("/", (req, res) => {

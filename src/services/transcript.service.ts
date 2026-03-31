@@ -45,7 +45,7 @@ const prisma = new PrismaClient({ adapter });
 /**
  * Compute a deterministic SHA-256 hash of the raw transcript text.
  */
-function hashTranscript(transcript: string): string {
+export function hashTranscript(transcript: string): string {
   return crypto.createHash("sha256").update(transcript, "utf8").digest("hex");
 }
 

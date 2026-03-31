@@ -12,9 +12,9 @@ It converts raw meeting transcripts into a validated dependency graph of tasks, 
   - Validation and sanitization of dependencies
   - Cycle detection and non‑crashing error handling
   - Data persistence in PostgreSQL via Prisma
-- **Level 2 – Async & Idempotency**: ⚠️ Partially completed  
+- **Level 2 – Async & Idempotency**: ✅ Completed  
   - Idempotent processing for identical transcripts (no repeated LLM calls) ✅  
-  - Async job / polling API pattern (jobId + status endpoint) ❌ (design ready, not implemented)
+  - Async job / polling API pattern (jobId + status endpoint) ✅
 - **Level 3 – Visualization & UI**: ❌ Not implemented in this repo (backend only)
 
 ---
@@ -100,6 +100,73 @@ It converts raw meeting transcripts into a validated dependency graph of tasks, 
 
 ---
 
+### `POST /jobs`
+
+- Asynchronous submission that immediately returns a `jobId`.
+- Idempotent by transcript hash: submitting the same transcript returns the existing job instead of re‑calling the LLM.
+
+**Request body:**
+
+```json
+{
+  "transcript": "Full meeting transcript text here..."
+}
+```
+
+**Response (202 Accepted or 200 if already done):**
+
+```json
+{
+  "jobId": "09c2e9b1-...-4d7c",
+  "hash": "6a9f...",
+  "status": "pending" | "processing" | "done" | "error",
+  "result": {
+    "hash": "6a9f...",
+    "createdAt": "2025-02-04T13:25:42.000Z",
+    "tasks": [
+      {
+        "id": "task-1",
+        "description": "Set up CI pipeline",
+        "priority": "high",
+        "dependencies": ["task-2"],
+        "status": "ok"
+      }
+    ]
+  },
+  "error": "error message if status=error"
+}
+```
+
+### `GET /jobs/:jobId`
+
+Poll a job created via `POST /jobs` to check its status or retrieve the final tasks.
+
+**Response (200 OK):**
+
+```json
+{
+  "jobId": "09c2e9b1-...-4d7c",
+  "hash": "6a9f...",
+  "status": "pending" | "processing" | "done" | "error",
+  "result": {
+    "hash": "6a9f...",
+    "createdAt": "2025-02-04T13:25:42.000Z",
+    "tasks": [
+      {
+        "id": "task-1",
+        "description": "Set up CI pipeline",
+        "priority": "high",
+        "dependencies": ["task-2"],
+        "status": "ok"
+      }
+    ]
+  },
+  "error": "error message if status=error"
+}
+```
+
+---
+
 ## Data Model (Prisma)
 
 ### `Transcript`
@@ -112,8 +179,8 @@ It converts raw meeting transcripts into a validated dependency graph of tasks, 
 
 ### `Task`
 
-- `id: String @id @default(uuid())`
-- `transcriptId: String` – FK to `Transcript`
+- `id: String` – LLM-provided task id (e.g., "task-1")
+- `transcriptId: String` – FK to `Transcript` (composite primary key with `id`)
 - `description: String`
 - `priority: TaskPriority` (`low | medium | high`)
 - `dependencies: Json` – stored as `string[]` of task IDs
