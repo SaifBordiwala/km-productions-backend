@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
-import cors from "cors";
+import cors, { type CorsOptions } from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
@@ -27,19 +27,41 @@ app.use(
     hsts: { maxAge: 15552000 },
     dnsPrefetchControl: { allow: false },
     referrerPolicy: { policy: "same-origin" },
+    // Allow browsers on another origin (e.g. frontend :3001 → API :3000) to read responses.
+    crossOriginResourcePolicy: { policy: "cross-origin" },
   }),
 );
 app.use(helmet.xssFilter());
 app.use(helmet.hidePoweredBy());
 app.use(helmet.noSniff());
 
+function corsOrigin(): CorsOptions["origin"] {
+  const fromEnv = process.env.ALLOWED_ORIGINS?.split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+  if (fromEnv && fromEnv.length > 0) {
+    return fromEnv;
+  }
+  // Dev: frontend on another port (e.g. :3001) is cross-origin; reflect Origin so credentials work.
+  if (process.env.NODE_ENV !== "production") {
+    return true;
+  }
+  return false;
+}
+
 // Enable CORS with specific configuration
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(","), // Allow all origins, adjust this in production
+    origin: corsOrigin(),
     optionsSuccessStatus: 200,
     methods: ["GET", "PUT", "PATCH", "POST", "DELETE", "OPTIONS", "HEAD"],
-    allowedHeaders: ["Authorization", "Content-Type"],
+    allowedHeaders: [
+      "Authorization",
+      "Content-Type",
+      "Accept",
+      "Origin",
+      "X-Requested-With",
+    ],
     credentials: true,
     exposedHeaders: ["Content-Disposition"],
   }),
