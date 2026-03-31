@@ -55,6 +55,7 @@ NODE_ENV=development
 PORT=3000
 DATABASE_URL=postgresql://<user>:<password>@<host>/<db>?sslmode=require
 JOB_SIMULATION_DELAY_MS = 5000
+ALLOWED_ORIGINS=http://localhost:3001
 ```
 
 ### 4) Generate/apply database migration
