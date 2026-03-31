@@ -24,7 +24,7 @@ server.on("listening", () => {
   const port = typeof address === "string" ? address : address?.port;
 
   logger.info("Server running", {
-    Application: "Insightboard Form APIs",
+    Application: "K$M Productions Form APIs",
     Environment: process.env.NODE_ENV,
     Port: port,
     Platform: process.platform,

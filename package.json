@@ -1,15 +1,15 @@
 {
-  "name": "insightboard-backend",
+  "name": "km-tech-assignment-backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "postinstall": "DATABASE_URL=${DATABASE_URL:-postgresql://dummy:dummy@localhost:5432/dummy} prisma generate",
-    "build": "tsc",
-    "dev": "ts-node src/server.ts",
-    "dev:watch": "nodemon --exec ts-node src/server.ts",
-    "prod": "node dist/server.js",
-    "prisma:local": "dotenv -e .env -- prisma migrate dev",
-    "prisma:prod": "dotenv -e .env -- prisma migrate deploy"
+    "build": "node ./node_modules/typescript/bin/tsc",
+    "dev": "node ./node_modules/ts-node/dist/bin.js src/server.ts",
+    "dev:watch": "node ./node_modules/nodemon/bin/nodemon.js --exec \"node ./node_modules/ts-node/dist/bin.js\" src/server.ts",
+    "start": "node dist/server.js",
+    "prisma:local": "node ./node_modules/prisma/build/index.js migrate dev --name init",
+    "prisma:prod": "node ./node_modules/prisma/build/index.js migrate deploy"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "express": "^5.2.1",
     "helmet": "^8.1.0",
     "morgan": "^1.10.1",
+    "multer": "^2.1.1",
     "pg": "^8.18.0",
     "prisma": "^7.3.0",
     "winston": "^3.19.0",
@@ -35,6 +36,7 @@
     "@types/express": "^5.0.6",
     "@types/helmet": "^0.0.48",
     "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.1.0",
     "@types/node": "^25.2.0",
     "cross-env": "^10.1.0",
     "dotenv-cli": "^11.0.0",

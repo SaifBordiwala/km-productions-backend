@@ -12,34 +12,20 @@ datasource db {
   provider = "postgresql"
 }
 
-model Transcript {
+model Job {
   id        String   @id @default(uuid())
-  content   String
-  hash      String   @unique
+  status    JobStatus @default(PENDING)
+  imagePath String
+  resultUrl String?
+  error     String?
+
   createdAt DateTime @default(now())
-
-  tasks     Task[]
+  updatedAt DateTime @updatedAt
 }
 
-model Task {
-  id           String       @id @default(uuid())
-  transcriptId String
-  transcript   Transcript   @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
-
-  description  String
-  priority     TaskPriority
-  dependencies Json
-  status       TaskStatus
-}
-
-enum TaskPriority {
-  low
-  medium
-  high
-}
-
-enum TaskStatus {
-  ready
-  blocked
-  error
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
 }

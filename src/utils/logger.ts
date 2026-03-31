@@ -1,8 +1,11 @@
 import { createLogger, format, transports } from "winston";
+import fs from "fs";
 
 const { combine, timestamp, json, printf, errors, colorize } = format;
 
 import settings from "./settings";
+
+fs.mkdirSync(settings.logPath, { recursive: true });
 
 const logFormat = combine(
   timestamp({ format: "YYYY-MM-DD[T]HH:mm:ss" }),
@@ -56,7 +59,7 @@ switch (process.env.NODE_ENV) {
     break;
 }
 
-logger.on("error", (err: any) => {
+logger.on("error", (err: unknown) => {
   // eslint-disable-next-line no-console
   console.log("Logging error: ", err);
 });
